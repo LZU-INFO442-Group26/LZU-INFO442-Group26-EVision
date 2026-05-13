@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from contextlib import asynccontextmanager
 from .models import Base
+import os
 import config
 from config.db_config import mysql_db_config, sqlite_db_config, postgres_db_config
 
@@ -54,24 +55,75 @@ def get_async_engine(db_type: str = None):
     if db_type is None:
         db_type = config.SAVE_DATA_OPTION
 
-    if db_type in _engines:
-        return _engines[db_type]
-
     if db_type in ["json", "jsonl", "csv"]:
         return None
 
     if db_type == "sqlite":
-        db_url = f"sqlite+aiosqlite:///{sqlite_db_config['db_path']}"
+        sqlite_db_path = sqlite_db_config["db_path"]
+        if config.SAVE_DATA_PATH:
+            platform_db_name = f"{config.PLATFORM}.db" if config.PLATFORM else "sqlite_tables.db"
+            sqlite_db_path = os.path.join(config.SAVE_DATA_PATH, platform_db_name)
+        sqlite_db_path = os.path.abspath(sqlite_db_path)
+        os.makedirs(os.path.dirname(sqlite_db_path), exist_ok=True)
+        db_url = f"sqlite+aiosqlite:///{sqlite_db_path}"
+        engine_cache_key = f"sqlite::{sqlite_db_path}"
     elif db_type == "mysql" or db_type == "db":
         db_url = f"mysql+asyncmy://{mysql_db_config['user']}:{mysql_db_config['password']}@{mysql_db_config['host']}:{mysql_db_config['port']}/{mysql_db_config['db_name']}"
+        engine_cache_key = db_type
     elif db_type == "postgres":
         db_url = f"postgresql+asyncpg://{postgres_db_config['user']}:{postgres_db_config['password']}@{postgres_db_config['host']}:{postgres_db_config['port']}/{postgres_db_config['db_name']}"
+        engine_cache_key = db_type
     else:
         raise ValueError(f"Unsupported database type: {db_type}")
 
+    if engine_cache_key in _engines:
+        return _engines[engine_cache_key]
+
     engine = create_async_engine(db_url, echo=False)
-    _engines[db_type] = engine
+    _engines[engine_cache_key] = engine
     return engine
+
+
+def _get_platform_table_names(platform: str) -> list[str]:
+    table_names_by_platform = {
+        "bili": [
+            "bilibili_video",
+            "bilibili_video_comment",
+            "bilibili_up_info",
+            "bilibili_contact_info",
+            "bilibili_up_dynamic",
+        ],
+        "dy": [
+            "douyin_aweme",
+            "douyin_aweme_comment",
+            "dy_creator",
+        ],
+        "ks": [
+            "kuaishou_video",
+            "kuaishou_video_comment",
+        ],
+        "wb": [
+            "weibo_note",
+            "weibo_note_comment",
+            "weibo_creator",
+        ],
+        "xhs": [
+            "xhs_creator",
+            "xhs_note",
+            "xhs_note_comment",
+        ],
+        "tieba": [
+            "tieba_note",
+            "tieba_comment",
+            "tieba_creator",
+        ],
+        "zhihu": [
+            "zhihu_content",
+            "zhihu_comment",
+            "zhihu_creator",
+        ],
+    }
+    return table_names_by_platform.get(platform, list(Base.metadata.tables.keys()))
 
 
 async def create_tables(db_type: str = None):
@@ -81,7 +133,12 @@ async def create_tables(db_type: str = None):
     engine = get_async_engine(db_type)
     if engine:
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+            if db_type == "sqlite":
+                table_names = _get_platform_table_names(config.PLATFORM)
+                tables = [Base.metadata.tables[name] for name in table_names if name in Base.metadata.tables]
+                await conn.run_sync(lambda sync_conn: Base.metadata.create_all(sync_conn, tables=tables))
+            else:
+                await conn.run_sync(Base.metadata.create_all)
 
 
 @asynccontextmanager

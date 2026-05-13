@@ -23,6 +23,8 @@
 # @Desc    :
 from typing import List
 
+from sqlalchemy import select
+
 import config
 from var import source_keyword_var
 
@@ -152,6 +154,32 @@ def _extract_music_download_url(aweme_detail: Dict) -> str:
     play_url = music_item.get("play_url", {})
     music_url = play_url.get("uri", "")
     return music_url
+
+
+async def filter_existing_aweme_ids(aweme_ids: List[str]) -> List[str]:
+    """Return only aweme_ids that are not yet stored in DB.
+
+    Works for sqlite/mysql/postgres modes. For file modes (excel/json/jsonl/csv), returns input unchanged.
+    """
+    if not aweme_ids:
+        return []
+
+    if config.SAVE_DATA_OPTION not in ("sqlite", "db", "postgres"):
+        return aweme_ids
+
+    try:
+        ids_int = [int(x) for x in aweme_ids if str(x).isdigit()]
+    except Exception:
+        ids_int = []
+
+    if not ids_int:
+        return aweme_ids
+
+    async with get_session() as session:
+        result = await session.execute(select(DouyinAweme.aweme_id).where(DouyinAweme.aweme_id.in_(ids_int)))
+        existing = {str(row[0]) for row in result.all()}
+
+    return [x for x in aweme_ids if str(x) not in existing]
 
 
 async def update_douyin_aweme(aweme_item: Dict):

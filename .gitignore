@@ -1,0 +1,15 @@
+# --- 必须忽略的“垃圾”文件（跟项目逻辑无关，只跟你的电脑环境有关） ---
+.venv/
+.uv-cache/
+__pycache__/
+node_modules/
+.DS_Store
+.idea/
+.vscode/
+
+# --- 课程要求的日志和数据：不要写在 ignore 里 ---
+# (所以这里空着，Git 就会默认追踪所有的 .xlsx, .db, .log 文件)
+
+# --- 特定的排除项：不要上传这个文件夹 ---
+# 根据你的截图，路径如下：
+**/bai_nian_chuan_qi/

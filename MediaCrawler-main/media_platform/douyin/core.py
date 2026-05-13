@@ -169,10 +169,24 @@ class DouYinCrawler(AbstractCrawler):
                         continue
                     aweme_list.append(aweme_info.get("aweme_id", ""))
                     page_aweme_list.append(aweme_info.get("aweme_id", ""))
+
+                # 先对本页的 aweme_id 做数据库查重，已存在的直接跳过“详情/评论/媒体”拉取
+                page_aweme_list = [aweme_id for aweme_id in page_aweme_list if aweme_id]
+                if config.SAVE_DATA_OPTION in ("sqlite", "db", "postgres"):
+                    page_aweme_list = await douyin_store.filter_existing_aweme_ids(page_aweme_list)
+
+                for post_item in posts_res.get("data"):
+                    try:
+                        aweme_info: Dict = (post_item.get("aweme_info") or post_item.get("aweme_mix_info", {}).get("mix_items")[0])
+                    except TypeError:
+                        continue
+                    aweme_id = aweme_info.get("aweme_id", "")
+                    if not aweme_id or aweme_id not in page_aweme_list:
+                        continue
                     await douyin_store.update_douyin_aweme(aweme_item=aweme_info)
                     await self.get_aweme_media(aweme_item=aweme_info)
-                
-                # Batch get note comments for the current page
+
+                # Batch get note comments for the current page（只对未入库的 aweme 拉取评论）
                 await self.batch_get_note_comments(page_aweme_list)
 
                 # Sleep after each page navigation
