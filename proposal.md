@@ -70,7 +70,7 @@ We expect to collect:
 | Bilibili | 800–1,200 |
 | Xiaohongshu | 300–500 |
 
-The final dataset is expected to contain more than 10,000 text entries and multiple structured features.
+The final dataset is expected to contain more than 2000 text entries and multiple structured features.
 
 ---
 
