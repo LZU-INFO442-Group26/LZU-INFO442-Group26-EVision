@@ -1,6 +1,0 @@
-2026/05/12-17:33:42.701 1e0ab6 Reusing MANIFEST /Users/wangch/coding/Crawler/MediaCrawler-main/browser_data/bili_user_data_dir/Default/Local Storage/leveldb/MANIFEST-000001
-2026/05/12-17:33:42.703 1e0ab6 Recovering log #31
-2026/05/12-17:33:42.703 1e0ab6 Reusing old log /Users/wangch/coding/Crawler/MediaCrawler-main/browser_data/bili_user_data_dir/Default/Local Storage/leveldb/000031.log 
-2026/05/12-17:34:42.707 1e0ab9 Level-0 table #35: started
-2026/05/12-17:34:42.709 1e0ab9 Level-0 table #35: 39073 bytes OK
-2026/05/12-17:34:42.712 1e0ab9 Delete type=0 #31
