@@ -1,0 +1,18 @@
+2026/05/12-14:50:58.092 1a00cf Reusing MANIFEST /Users/wangch/coding/Crawler/MediaCrawler-main/browser_data/bili_user_data_dir/Default/Local Storage/leveldb/MANIFEST-000001
+2026/05/12-14:50:58.094 1a00cf Recovering log #25
+2026/05/12-14:50:58.094 1a00cf Reusing old log /Users/wangch/coding/Crawler/MediaCrawler-main/browser_data/bili_user_data_dir/Default/Local Storage/leveldb/000025.log 
+2026/05/12-14:51:58.101 1a00d2 Level-0 table #29: started
+2026/05/12-14:51:58.103 1a00d2 Level-0 table #29: 36766 bytes OK
+2026/05/12-14:51:58.105 1a00d2 Delete type=0 #25
+2026/05/12-14:51:58.105 1a00d2 Compacting 4@0 + 1@1 files
+2026/05/12-14:51:58.108 1a00d2 Generated table #30@0: 25 keys, 39514 bytes
+2026/05/12-14:51:58.108 1a00d2 Compacted 4@0 + 1@1 files => 39514 bytes
+2026/05/12-14:51:58.108 1a00d2 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/05/12-14:51:58.109 1a00d2 Delete type=2 #29
+2026/05/12-14:51:58.109 1a00d2 Delete type=2 #21
+2026/05/12-14:51:58.109 1a00d2 Delete type=2 #26
+2026/05/12-14:51:58.109 1a00d2 Delete type=2 #18
+2026/05/12-14:51:58.109 1a00d2 Delete type=2 #24
+2026/05/12-14:52:05.897 1a00d2 Level-0 table #32: started
+2026/05/12-14:52:05.900 1a00d2 Level-0 table #32: 37723 bytes OK
+2026/05/12-14:52:05.902 1a00d2 Delete type=0 #28
